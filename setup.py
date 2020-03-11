@@ -22,17 +22,10 @@ def readfile(filename):
     with io.open(filename, encoding="utf-8") as stream:
         return stream.read().split()
 
-
-#requiers = readfile ('requirements.txt')
-#
-# add minimum requirements here
-#
 requiers = """
 psutil
 pygments
 """.split("\n")
-
-# dependency_links = ['http://github.com/nicolaiarocci/eve.git@develop']
 
 version = readfile("VERSION")[0].strip()
 
