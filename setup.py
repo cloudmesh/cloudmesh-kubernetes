@@ -15,8 +15,10 @@
 # limitations under the License.                                          #
 # ------------------------------------------------------------------------#
 
-from setuptools import find_packages, setup
 import io
+
+from setuptools import find_packages, setup
+
 
 def readfile(filename):
     with io.open(filename, encoding="utf-8") as stream:
@@ -29,7 +31,7 @@ pygments
 
 version = readfile("VERSION")[0].strip()
 
-with open('README.md') as f:
+with open('README-old.md') as f:
     long_description = f.read()
 
 
