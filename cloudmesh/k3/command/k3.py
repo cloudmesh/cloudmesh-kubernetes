@@ -1,23 +1,23 @@
 from __future__ import print_function
 from cloudmesh.shell.command import command
 from cloudmesh.shell.command import PluginCommand
-from cloudmesh.k8.api.manager import Manager
+from cloudmesh.k3.api.manager import Manager
 from cloudmesh.common.console import Console
 from cloudmesh.common.util import path_expand
 from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
 
-class K8Command(PluginCommand):
+class K3Command(PluginCommand):
 
     # noinspection PyUnusedLocal
     @command
-    def do_k8(self, args, arguments):
+    def do_k3(self, args, arguments):
         """
         ::
 
           Usage:
-                k8 --file=FILE
-                k8 list
+                k3 --file=FILE
+                k3 list
 
           This command does some useful things.
 

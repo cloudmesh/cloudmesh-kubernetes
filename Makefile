@@ -1,4 +1,4 @@
-package=k8
+package=kubernetes
 UNAME=$(shell uname)
 VERSION=`head -1 VERSION`
 
@@ -38,7 +38,7 @@ manual:
 	echo "========" >> docs-source/source/manual/commands.rst
 	echo  >> docs-source/source/manual/commands.rst
 	tail -n +4 /tmp/commands.rst >> docs-source/source/manual/commands.rst
-	cms man --kind=rst k8 > docs-source/source/manual/admin.rst
+	cms man --kind=rst k3 > docs-source/source/manual/admin.rst
 	cms man --kind=rst foo > docs-source/source/manual/banner.rst
 
 doc:

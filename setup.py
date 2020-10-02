@@ -36,11 +36,11 @@ with open('README.md') as f:
 
 
 
-NAME = "cloudmesh-k8"
-DESCRIPTION = "A command called k8 and foo for the cloudmesh shell"
+NAME = "cloudmesh-kubernetes"
+DESCRIPTION = "A command called k3 and foo for the cloudmesh shell"
 AUTHOR = "Gregor von Laszewski"
 AUTHOR_EMAIL = "laszewski@gmail.com"
-URL = "https://github.com/cloudmesh/cloudmesh-k8"
+URL = "https://github.com/cloudmesh/cloudmesh-kubernetes"
 
 
 setup(
