@@ -18,6 +18,7 @@ class K3Command(PluginCommand):
           Usage:
                 k3 --file=FILE
                 k3 list
+                k3 deploy --host=HOSTS
 
           This command does some useful things.
 
