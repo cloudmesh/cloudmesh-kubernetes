@@ -78,8 +78,8 @@ class K3Command(PluginCommand):
 
 
     def install_kubernetes(self, hosts):
-        url = get_url
-        key = get_key
+        url = get_url()
+        key = get_key()
         command = 'sudo k3s agent --server https://{K3S_URL}:6443 --token {K3S_TOKEN}'.format(url, key)
         self.exec_on_remote_hosts(self, hosts, command)
 
