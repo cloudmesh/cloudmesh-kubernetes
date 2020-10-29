@@ -13,3 +13,5 @@ Documentation
 see cloudmesh.cmd5
 
 * https://github.com/cloudmesh/cloudmesh.cmd5
+
+TEST COMMAND: k3 deploy --host=HOSTS
