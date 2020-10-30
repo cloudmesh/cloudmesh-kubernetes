@@ -55,7 +55,11 @@ class K3Command(PluginCommand):
     
     def deploy_kubernetes(self, hosts):
         self.upgrade(hosts)
+        deploy_main()
         self.install_kubernetes(hosts)
+    
+    def deploy_main():
+        os.system("curl -sfL https://get.k3s.io | sh -")
     
     def get_url():
         ip = os.popen("hostname -I").read()
