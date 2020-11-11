@@ -4,7 +4,7 @@ from cloudmesh.shell.command import PluginCommand
 from cloudmesh.k3.api.manager import Manager
 from cloudmesh.common.console import Console
 from cloudmesh.common.util import path_expand
-from pprint import pprint
+from pprint import pprintd9
 from cloudmesh.common.debug import VERBOSE
 import os
 
