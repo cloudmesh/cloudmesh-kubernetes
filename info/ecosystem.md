@@ -8,6 +8,9 @@
 * <https://docs.tilt.dev/choosing_clusters.html>
 * <https://www.civo.com/blog/k8s-vs-k3s>
 
+Other
+
+* <https://www.civo.com/learn/getting-started-with-kubernetes>
 
 ## Minikube
 
