@@ -8,6 +8,7 @@
 * <https://docs.tilt.dev/choosing_clusters.html>
 * <https://www.civo.com/blog/k8s-vs-k3s>
 
+
 ## Minikube
 
 * <https://minikube.sigs.k8s.io/docs/>
@@ -42,4 +43,7 @@
 
 ## kubeadmin
 
+## Rancher
+
+* <https://rancher.com/why-rancher/>
 
