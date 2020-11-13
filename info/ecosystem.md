@@ -29,3 +29,7 @@
 ## Cloud Native
 
 * <https://landscape.cncf.io/>
+
+## kops
+
+* <https://timesofcloud.com/k8s/minikube-vs-docker-client-vs-kops-vs-kubeadm/>
