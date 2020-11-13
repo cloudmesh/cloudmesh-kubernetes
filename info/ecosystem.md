@@ -1,6 +1,11 @@
 # Kubernetes
 
+## Comparisions
+
 * <https://www.cncf.io/wp-content/uploads/2020/08/CNCF-Webinar-Navigating-the-Sea-of-Local-Clusters-.pdf>
+* <https://www.padok.fr/en/blog/minikube-kubeadm-kind-k3s>
+* random <https://www.youtube.com/watch?v=mXURMEri9zU&ab_channel=TheNullChannel>
+* <https://docs.tilt.dev/choosing_clusters.html>
 
 ## Minikube
 
@@ -33,3 +38,7 @@
 ## kops
 
 * <https://timesofcloud.com/k8s/minikube-vs-docker-client-vs-kops-vs-kubeadm/>
+
+## kubeadmin
+
+
