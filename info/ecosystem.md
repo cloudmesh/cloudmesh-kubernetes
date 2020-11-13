@@ -6,6 +6,7 @@
 * <https://www.padok.fr/en/blog/minikube-kubeadm-kind-k3s>
 * random <https://www.youtube.com/watch?v=mXURMEri9zU&ab_channel=TheNullChannel>
 * <https://docs.tilt.dev/choosing_clusters.html>
+* <https://www.civo.com/blog/k8s-vs-k3s>
 
 ## Minikube
 
