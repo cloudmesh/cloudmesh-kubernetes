@@ -18,7 +18,9 @@ Other
 
 ## Microk8
 
+* <https://ubuntu.com/tutorials/install-a-local-kubernetes-with-microk8s#2-deploying-microk8s>
 * <https://medium.com/faun/local-kubernetes-for-linux-minikube-vs-microk8s-f096e8e869b2>
+
 
 ## kind
 
