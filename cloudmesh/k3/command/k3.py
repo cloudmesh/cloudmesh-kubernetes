@@ -17,18 +17,31 @@ class K3Command(PluginCommand):
         ::
 
           Usage:
-                k3 --file=FILE
+                k3 deploy [--workers] --host=HOSTS
+                k3 deploy --file=FILE
                 k3 list
-                k3 deploy --host=HOSTS
+                k3 status
 
-          This command does some useful things.
+          This command deloys kubernetes on remote hosts.
 
           Arguments:
-              FILE   a file name
+              FILE   a file that contains the specification
+              HOSTS  a list of hosts for deployment.
 
           Options:
               -f      specify the file
 
+          Description:
+              k3 deploy [--workers] --host=HOSTS
+                deploys kubernetes on the specified hosts. No master is used
+                if the flag --workers is specified. Otherwise the fisrt host in
+                the hostlist is the master. Hosts can be used with our
+                parameterized format such as "red-master,red[00-03]"
+
+              k3 deploy --file=FILE
+                 just as the deploy command, but each host is defined on each
+                 line in the FILE. Each line can use a parametersized
+                 specification.
         """
         arguments.FILE = arguments['--file'] or None
 
