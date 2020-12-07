@@ -22,6 +22,7 @@ class Kuberenetes:
                 """),
             "reboot": "sudo reboot",
             "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
+            "test": "ls -a && uname -a"
         },
         master: {
             "install": "curl -sfL https://get.k3s.io | sh -",
@@ -65,6 +66,15 @@ class Kuberenetes:
        ```
     
     """
+    @staticmethod
+    def sudo(command):
+        result = os.popen("sudo {command}").read()
+        return result
+
+    @staticmethod
+    def get_node_token():
+        token = Kuberenetes.sudo("cat /var/lib/rancher/k3s/server/node-token")
+        return token
 
     @staticmethod
     def oneline(script):
@@ -85,7 +95,7 @@ class Kuberenetes:
         return os.environ["KUBERNETES_MASTER"]
 
     @staticmethod
-    def do(kind, command, host, ssh=False):
+    def do(kind, command, host, ssh=False, oneline=False):
         """
         executes the script on the given host
 
@@ -94,6 +104,9 @@ class Kuberenetes:
         :return:
         """
         script = Kuberenetes.scripts[kind][command]
+        if oneline:
+            script = Kuberenetes.oneline(script)
+
         if ssh:
             script = f'ssh {host} "{script}"'
         Console.msg(script)
@@ -102,6 +115,13 @@ class Kuberenetes:
         #       do os.system in testing phase
         os.system(script)
         return None
+
+    @staticmethod
+    def upgrade(hosts):
+        command = Kuberenetes.scripts["all"]["update"]
+        result = Host.ssh(hosts, command)
+        # print(result[0]['stdout'])
+        return result
 
     @staticmethod
     def install(hosts, master=False, worker=False, force=False):
@@ -154,8 +174,11 @@ class Kuberenetes:
                 # install on each worker
                 # register on each worker
 
+                # TODO: invert parameters, reads better
                 Kuberenetes.do("all", "update")
                 Kuberenetes.do("all", "install")
+                Kuberenetes.do("all", "swap")
+
             for host in master_host:
                 Console.error("TODO: steps on master")
             for host in worker_hosts:
@@ -188,15 +211,18 @@ class Kuberenetes:
     # If you do not like static methods, we can use self where needed
     #
 
-    def deploy_kubernetes(self, hosts):
+    @staticmethod
+    def deploy_kubernetes(hosts):
         self.upgrade(hosts)
         deploy_main()
         self.install_kubernetes(hosts)
 
-    def deploy_main(self):
+    @staticmethod
+    def deploy_main():
         os.system("curl -sfL https://get.k3s.io | sh -")
 
-    def get_url(self):
+    @staticmethod
+    def get_url():
         # TODO: this is not a universal command. Works only on some OS.
         ip = os.popen("hostname -I").read()
         real_ip = ""
@@ -207,41 +233,39 @@ class Kuberenetes:
                 break
         return real_ip
 
-    def get_node_token(self):
-        key = os.popen("sudo cat /var/lib/rancher/k3s/server/node-token").read()
-        return key
 
-    def upgrade(self, hosts):
-        command = "sudo apt-get update && sudo apt-get upgrade"
-        self.exec_on_remote_hosts(self, hosts, command)
-
-    def swap(self, hosts):
+    @staticmethod
+    def swap(hosts):
         command = "sudo dphys-swapfile swapoff \
             && sudo dphys-swapfile uninstall \
                 && sudo update-rc.d dphys-swapfile remove"
         self.exec_on_remote_hosts(self, hosts, command)
 
-    def edit_boot(self, hosts):
+    @staticmethod
+    def edit_boot(hosts):
         # Need to figure out how to edit the boot file with a command
         # Also reboot
         pass
 
-    def install_kubernetes_on_master(self, hosts):
+    @staticmethod
+    def install_kubernetes_on_master(hosts):
         command = 'curl -sfL https://get.k3s.io | sh -'
-        self.exec_on_remote_hosts()  # need to make this only on master
+        Kubernetes.exec_on_remote_hosts()  # need to make this only on master
         #get_key()
         #export
         url = "http://{MASTER_IP_ADDRESS}:8080".format(get_url())
         # Incomplete
         return url
 
-    def install_kubernetes_on_worker(self, hosts):
-        url = get_url()
-        key = get_key()
+    @staticmethod
+    def install_kubernetes_on_worker(osts):
+        url = Kubernetes.get_url()
+        key = Kubernetes.get_key()
         command = f'sudo k3s agent --server https://{url}:6443 --token {key}'
-        self.exec_on_remote_hosts(self, hosts, command)
+        Kubernetes.exec_on_remote_hosts(hosts, command)
         # Incomplete
 
-    def exec_on_remote_hosts(self, hosts, command):
+    @staticmethod
+    def exec_on_remote_hosts(hosts, command):
         result = Host.ssh(hosts, command)
         print(result[0]['stdout'])
