@@ -80,12 +80,33 @@ class K3Command(PluginCommand):
         command = "sudo apt-get update && sudo apt-get upgrade"
         self.exec_on_remote_hosts(self, hosts, command)
 
+    def swap(self, hosts):
+        command = "sudo dphys-swapfile swapoff \
+            && sudo dphys-swapfile uninstall \
+                && sudo update-rc.d dphys-swapfile remove"
+        self.exec_on_remote_hosts(self, hosts, command)
 
-    def install_kubernetes(self, hosts):
+    def editBoot(self, hosts):
+        #Need to figure out how to edit the boot file with a command
+        #Also reboot
+        pass
+
+    def install_kubernetes_on_master(self,hosts):
+        command = 'curl -sfL https://get.k3s.io | sh -'
+        self.exec_on_remote_hosts()#need to make this only on master
+        get_key()
+        export KUBERNETES_MASTER="http://{MASTER_IP_ADDRESS}:8080".format(get_url())
+        #Incomplete
+
+
+
+
+    def install_kubernetes_on_worker(self, hosts):
         url = get_url()
         key = get_key()
         command = 'sudo k3s agent --server https://{K3S_URL}:6443 --token {K3S_TOKEN}'.format(url, key)
         self.exec_on_remote_hosts(self, hosts, command)
+        #Incomplete
 
     def exec_on_remote_hosts(self, hosts, command):
          result = Host.ssh(hosts, command)
