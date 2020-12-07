@@ -1,5 +1,6 @@
-from cloudmesh.common.Console import Console
+from cloudmesh.common.console import Console
 from cloudmesh.common.parameter import Parameter
+import textwrap
 import os
 
 
@@ -24,12 +25,12 @@ class Kuberenetes:
             "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
             "test": "ls -a && uname -a"
         },
-        master: {
+        'master': {
             "install": "curl -sfL https://get.k3s.io | sh -",
             "token": "sudo cat /var/lib/rancher/k3s/server/node-token",
             "nodes": "sudo kubectl get nodes",
         },
-        worker: {
+        'worker': {
 
         }
 
