@@ -7,33 +7,26 @@ from cloudmesh.common.Shell import Shell
 class Kubernetes(object):
 
     scripts = {
-        'any': {
-            "update": Shell.oneline(""" 
-                sudo apt-get update 
-                sudo apt-get upgrade
-                """),
-            "swap": Shell.oneline("""              
-                sudo dphys-swapfile swapoff
-                sudo dphys-swapfile uninstall
-                sudo update-rc.d dphys-swapfile remove
-                sudo swapon --summary
-                """),
-            "cgroups": Shell.oneline("""
-                sudo echo "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >> /boot/cmdline.txt
-                """),
-            "reboot": "sudo reboot",
-            "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
-            "test": "hostname && uname -a"
-        },
-        'master': {
-            "install": "curl -sfL https://get.k3s.io | sh -",
-            "token": "sudo cat /var/lib/rancher/k3s/server/node-token",
-            "nodes": "sudo kubectl get nodes",
-        },
-        'worker': {
-
-        }
-
+        "info": "hostname && uname -a",
+        "update": Shell.oneline(""" 
+            sudo apt-get update 
+            sudo apt-get upgrade
+            """),
+        "swap": Shell.oneline("""              
+            sudo dphys-swapfile swapoff
+            sudo dphys-swapfile uninstall
+            sudo update-rc.d dphys-swapfile remove
+            sudo swapon --summary
+            """),
+        "cgroups": Shell.oneline("""
+            sudo echo "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >> /boot/cmdline.txt
+            """),
+        "reboot": "sudo reboot",
+        "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
+        'install': "curl -sfL https://get.k3s.io | sh -",
+        "master.token": "sudo cat /var/lib/rancher/k3s/server/node-token",
+        "master.nodes": "sudo kubectl get nodes",
+        "worker.register": 'sudo k3s agent --server https://{url}:6443 --token {key}'
     }
 
     # TO BE INTEGRATED
@@ -67,12 +60,6 @@ class Kubernetes(object):
        ```
     
     """
-
-    @staticmethod
-    def sudo(command):
-        result = os.popen("sudo {command}").read()
-        return result
-
     @staticmethod
     def get_node_token():
         token = Kuberenetes.sudo("cat /var/lib/rancher/k3s/server/node-token")
@@ -82,41 +69,37 @@ class Kubernetes(object):
     @staticmethod
     def set_master_endpoint(ip=None):
         if not ip:
-            ip = Kuberenetes.do("any", "ip")
+            ip = Kuberenetes.do("ip")
         os.environ["KUBERNETES_MASTER"] = "http://{ip}:8080"
         return os.environ["KUBERNETES_MASTER"]
 
     @staticmethod
-    def do(kind, command, host, ssh=False, oneline=False):
+    def do(command, hosts, ssh=False, oneline=True, dryrun=False):
         """
         executes the script on the given host
 
         :param kind:
         :param command:
-        :param host:
+        :param hosts:
         :param ssh:
         :param oneline:
         :return:
         """
-        script = Kuberenetes.scripts[kind][command]
+        script = Kuberenetes.scripts[command]
+        if command in ["worker.register"]:
+            url = Kubernetes.get_url()  # is this correct
+            ip = Kuberenetes.do("ip")
+            script = script.format(url=url, ip=ip)
+
         if oneline:
             script = Kuberenetes.oneline(script)
 
-        if ssh:
-            script = f'ssh {host} "{script}"'
-        Console.msg(script)
-        # TODO: we should be using the Host.ssh command
-        #       parse for errors Shell.live seems good option.
-        #       For now we just
-        #       do os.system in testing phase
-        os.system(script)
-        return "not implemented"
+        if dryrun:
+            print (script)
+            result = None
+        else:
+            result = Host.ssh(hosts, script)
 
-    @staticmethod
-    def upgrade(hosts):
-        command = Kuberenetes.scripts["any"]["update"]
-        result = Host.ssh(hosts, command)
-        # print(result[0]['stdout'])
         return result
 
     @staticmethod
@@ -139,16 +122,16 @@ class Kubernetes(object):
             worker = True
         if master:
             Console.error("master deployment not yet implemented")
-            Kuberenetes.do("any", "update")
-            Kuberenetes.do("any", "install")
-            token = Kuberenetes.do("any", "token")
-            ip = Kuberenetes.do("any", "ip")
+            Kuberenetes.do("update")
+            Kuberenetes.do("install")
+            token = Kuberenetes.do("master.token")
+            ip = Kuberenetes.do("ip")
             Kuberenetes.set_master_endpoint(ip=None)
             # ...
         if worker:
             Console.error("master deployment not yet implemented")
-            token = Kuberenetes.do("any", "token")
-            ip = Kuberenetes.do("any", "ip")
+            token = Kuberenetes.do("master.token")
+            ip = Kuberenetes.do("ip")
 
             # TODO: check may need to be different for now we just check for none
 
@@ -171,9 +154,9 @@ class Kubernetes(object):
                 # register on each worker
 
                 # TODO: invert parameters, reads better
-                Kuberenetes.do("any", "update")
-                Kuberenetes.do("any", "install")
-                Kuberenetes.do("any", "swap")
+                Kuberenetes.do("update")
+                Kuberenetes.do("install")
+                Kuberenetes.do("swap")
 
             for host in master_host:
                 Console.error("TODO: steps on master")
@@ -208,15 +191,6 @@ class Kubernetes(object):
     #
 
     @staticmethod
-    def deploy_kubernetes(hosts):
-        Kuberenetes.deploy_main()
-        Kuberenetes.install_kubernetes(hosts)
-
-    @staticmethod
-    def deploy_main():
-        os.system("curl -sfL https://get.k3s.io | sh -")
-
-    @staticmethod
     def get_url():
         # TODO: this is not a universal command. Works only on some OS.
         ip = os.popen("hostname -I").read()
@@ -229,38 +203,11 @@ class Kubernetes(object):
         return real_ip
 
     @staticmethod
-    def swap(hosts):
-        command = "sudo dphys-swapfile swapoff \
-            && sudo dphys-swapfile uninstall \
-                && sudo update-rc.d dphys-swapfile remove"
-        Kuberenetes.exec_on_remote_hosts(self, hosts, command)
+    def portal():
+        """
+        Opens the kubernetes Web ortal in a new browser. Only works in Desktop.
+        """
+        url = f"http://localhost:8080"
+        Shell.brwser(url)
 
-    @staticmethod
-    def edit_boot(hosts):
-        # Need to figure out how to edit the boot file with a command
-        # Also reboot
-        pass
 
-    @staticmethod
-    def install_kubernetes_on_master(hosts):
-        command = 'curl -sfL https://get.k3s.io | sh -'
-        Kubernetes.exec_on_remote_hosts()  # need to make this only on master
-        # get_key()
-        # export
-        ip = Kuberenetes.get_url()
-        url = f"http://{ip}:8080"
-        # Incomplete
-        return url
-
-    @staticmethod
-    def install_kubernetes_on_worker(osts):
-        url = Kubernetes.get_url()
-        key = Kubernetes.get_key()
-        command = f'sudo k3s agent --server https://{url}:6443 --token {key}'
-        Kubernetes.exec_on_remote_hosts(hosts, command)
-        # Incomplete
-
-    @staticmethod
-    def exec_on_remote_hosts(hosts, command):
-        result = Host.ssh(hosts, command)
-        print(result[0]['stdout'])
