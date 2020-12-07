@@ -6,20 +6,8 @@ from cloudmesh.common.Shell import Shell
 
 class Kubernetes(object):
 
-    @staticmethod
-    def oneline(script):
-        """
-        converts a script to one line command.
-        THis is useful to run a single ssh command and pass a one line script.
-
-        :param script:
-        :return:
-        """
-        return " && ".join(textwrap.online(script).strip().splitline())
-
-
     scripts = {
-        'all': {
+        'any': {
             "update": Shell.oneline(""" 
                 sudo apt-get update 
                 sudo apt-get upgrade
@@ -35,7 +23,7 @@ class Kubernetes(object):
                 """),
             "reboot": "sudo reboot",
             "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
-            "test": "ls -a && uname -a"
+            "test": "hostname && uname -a"
         },
         'master': {
             "install": "curl -sfL https://get.k3s.io | sh -",
@@ -94,7 +82,7 @@ class Kubernetes(object):
     @staticmethod
     def set_master_endpoint(ip=None):
         if not ip:
-            ip = Kuberenetes.do("all", "ip")
+            ip = Kuberenetes.do("any", "ip")
         os.environ["KUBERNETES_MASTER"] = "http://{ip}:8080"
         return os.environ["KUBERNETES_MASTER"]
 
@@ -125,7 +113,7 @@ class Kubernetes(object):
 
     @staticmethod
     def upgrade(hosts):
-        command = Kuberenetes.scripts["all"]["update"]
+        command = Kuberenetes.scripts["any"]["update"]
         result = Host.ssh(hosts, command)
         # print(result[0]['stdout'])
         return result
@@ -150,16 +138,16 @@ class Kubernetes(object):
             worker = True
         if master:
             Console.error("master deployment not yet implemented")
-            Kuberenetes.do("all", "update")
-            Kuberenetes.do("all", "install")
-            token = Kuberenetes.do("all", "token")
-            ip = Kuberenetes.do("all", "ip")
+            Kuberenetes.do("any", "update")
+            Kuberenetes.do("any", "install")
+            token = Kuberenetes.do("any", "token")
+            ip = Kuberenetes.do("any", "ip")
             Kuberenetes.set_master_endpoint(ip=None)
             # ...
         if worker:
             Console.error("master deployment not yet implemented")
-            token = Kuberenetes.do("all", "token")
-            ip = Kuberenetes.do("all", "ip")
+            token = Kuberenetes.do("any", "token")
+            ip = Kuberenetes.do("any", "ip")
 
             # TODO: check may need to be different for now we just check for none
 
@@ -182,9 +170,9 @@ class Kubernetes(object):
                 # register on each worker
 
                 # TODO: invert parameters, reads better
-                Kuberenetes.do("all", "update")
-                Kuberenetes.do("all", "install")
-                Kuberenetes.do("all", "swap")
+                Kuberenetes.do("any", "update")
+                Kuberenetes.do("any", "install")
+                Kuberenetes.do("any", "swap")
 
             for host in master_host:
                 Console.error("TODO: steps on master")
