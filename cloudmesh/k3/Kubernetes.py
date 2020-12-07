@@ -19,3 +19,7 @@ class Kuberenetes:
     @staticmethod
     def stop(hosts):
         pass
+
+    @staticmethod
+    def update(hosts):
+        pass
