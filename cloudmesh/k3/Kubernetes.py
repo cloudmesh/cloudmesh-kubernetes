@@ -2,8 +2,8 @@ from cloudmesh.common.Console import Console
 from cloudmesh.common.parameter import Parameter
 import os
 
-class Kuberenetes:
 
+class Kuberenetes:
     scripts = {
         'all': {
             "update": textwrap.dedent(
@@ -22,18 +22,17 @@ class Kuberenetes:
                 """),
             "reboot": "sudo reboot",
             "ip": "if a | fgrep inet | fgrep . | fgrep -v 127 | cut -d ' ' -f 2",
-        }
-        master:{
+        },
+        master: {
             "install": "curl -sfL https://get.k3s.io | sh -",
             "token": "sudo cat /var/lib/rancher/k3s/server/node-token",
             "nodes": "sudo kubectl get nodes",
-        }
-        worker:{
+        },
+        worker: {
 
         }
 
     }
-
 
     # TO BE INTEGRATED
     """
@@ -81,7 +80,7 @@ class Kuberenetes:
     @staticmethod
     def set_master_endpoint(ip=None):
         if not ip:
-            ip = Kuberenetes.do("all","ip")
+            ip = Kuberenetes.do("all", "ip")
         os.environ["KUBERNETES_MASTER"] = "http://{ip}:8080"
         return os.environ["KUBERNETES_MASTER"]
 
@@ -102,6 +101,7 @@ class Kuberenetes:
         #       parse for errors Shell.live seems good option. For now we just
         #       do os.system in testing phase
         os.system(script)
+        return None
 
     @staticmethod
     def install(hosts, master=False, worker=False, force=False):
@@ -182,3 +182,66 @@ class Kuberenetes:
     @staticmethod
     def update(hosts):
         pass
+
+    #
+    # classes to be integrated in the above
+    # If you do not like static methods, we can use self where needed
+    #
+
+    def deploy_kubernetes(self, hosts):
+        self.upgrade(hosts)
+        deploy_main()
+        self.install_kubernetes(hosts)
+
+    def deploy_main(self):
+        os.system("curl -sfL https://get.k3s.io | sh -")
+
+    def get_url(self):
+        # TODO: this is not a universal command. Works only on some OS.
+        ip = os.popen("hostname -I").read()
+        real_ip = ""
+        for letter in ip:
+            if letter != " ":
+                real_ip = real_ip + letter
+            else:
+                break
+        return real_ip
+
+    def get_node_token(self):
+        key = os.popen("sudo cat /var/lib/rancher/k3s/server/node-token").read()
+        return key
+
+    def upgrade(self, hosts):
+        command = "sudo apt-get update && sudo apt-get upgrade"
+        self.exec_on_remote_hosts(self, hosts, command)
+
+    def swap(self, hosts):
+        command = "sudo dphys-swapfile swapoff \
+            && sudo dphys-swapfile uninstall \
+                && sudo update-rc.d dphys-swapfile remove"
+        self.exec_on_remote_hosts(self, hosts, command)
+
+    def edit_boot(self, hosts):
+        # Need to figure out how to edit the boot file with a command
+        # Also reboot
+        pass
+
+    def install_kubernetes_on_master(self, hosts):
+        command = 'curl -sfL https://get.k3s.io | sh -'
+        self.exec_on_remote_hosts()  # need to make this only on master
+        #get_key()
+        #export
+        url = "http://{MASTER_IP_ADDRESS}:8080".format(get_url())
+        # Incomplete
+        return url
+
+    def install_kubernetes_on_worker(self, hosts):
+        url = get_url()
+        key = get_key()
+        command = f'sudo k3s agent --server https://{url}:6443 --token {key}'
+        self.exec_on_remote_hosts(self, hosts, command)
+        # Incomplete
+
+    def exec_on_remote_hosts(self, hosts, command):
+        result = Host.ssh(hosts, command)
+        print(result[0]['stdout'])
