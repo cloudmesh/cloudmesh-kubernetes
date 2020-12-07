@@ -4,7 +4,8 @@ import textwrap
 import os
 
 
-class Kuberenetes:
+class Kuberenetes(object):
+
     scripts = {
         'all': {
             "update": textwrap.dedent(
@@ -67,6 +68,7 @@ class Kuberenetes:
        ```
     
     """
+
     @staticmethod
     def sudo(command):
         result = os.popen("sudo {command}").read()
@@ -102,6 +104,9 @@ class Kuberenetes:
 
         :param kind:
         :param command:
+        :param host:
+        :param ssh:
+        :param oneline:
         :return:
         """
         script = Kuberenetes.scripts[kind][command]
@@ -115,7 +120,7 @@ class Kuberenetes:
         #       parse for errors Shell.live seems good option. For now we just
         #       do os.system in testing phase
         os.system(script)
-        return None
+        return "not implemented"
 
     @staticmethod
     def upgrade(hosts):
@@ -214,9 +219,8 @@ class Kuberenetes:
 
     @staticmethod
     def deploy_kubernetes(hosts):
-        self.upgrade(hosts)
-        deploy_main()
-        self.install_kubernetes(hosts)
+        Kuberenetes.deploy_main()
+        Kuberenetes.install_kubernetes(hosts)
 
     @staticmethod
     def deploy_main():
@@ -234,13 +238,12 @@ class Kuberenetes:
                 break
         return real_ip
 
-
     @staticmethod
     def swap(hosts):
         command = "sudo dphys-swapfile swapoff \
             && sudo dphys-swapfile uninstall \
                 && sudo update-rc.d dphys-swapfile remove"
-        self.exec_on_remote_hosts(self, hosts, command)
+        Kuberenetes.exec_on_remote_hosts(self, hosts, command)
 
     @staticmethod
     def edit_boot(hosts):
@@ -252,9 +255,10 @@ class Kuberenetes:
     def install_kubernetes_on_master(hosts):
         command = 'curl -sfL https://get.k3s.io | sh -'
         Kubernetes.exec_on_remote_hosts()  # need to make this only on master
-        #get_key()
-        #export
-        url = "http://{MASTER_IP_ADDRESS}:8080".format(get_url())
+        # get_key()
+        # export
+        ip = Kuberenetes.get_url()
+        url = f"http://{ip}:8080"
         # Incomplete
         return url
 

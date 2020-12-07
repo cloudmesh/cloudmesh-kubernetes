@@ -1,28 +1,26 @@
 from cloudmesh.shell.command import command
 from cloudmesh.shell.command import PluginCommand
 from cloudmesh.common.console import Console
-from cloudmesh.common.util import path_expand
 from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
-import os
 from cloudmesh.shell.command import map_parameters
-from cloudmesh.kubernetes.Kubernetes import Kubernetes
 
 
-class K3Command(PluginCommand):
+
+class KubernetesCommand(PluginCommand):
 
     # noinspection PyUnusedLocal
     @command
-    def do_k3(self, args, arguments):
+    def do_kubernetes(self, args, arguments):
         """
         ::
 
           Usage:
-                k3 deploy [--workers] --host=HOSTS
-                k3 deploy --file=FILE
-                k3 list
-                k3 status
-                k3 scripts
+                kubernetes deploy [--workers] --host=HOSTS
+                kubernetes deploy --file=FILE
+                kubernetes list
+                kubernetes status
+                kubernetes scripts
 
           This command deloys kubernetes on remote hosts.
 
@@ -52,7 +50,8 @@ class K3Command(PluginCommand):
                        'file',
                        'host')
 
-
+        from cloudmesh.kubernetes.Kubernetes import Kubernetes
+        
         if arguments.scripts:
 
             pprint(Kubernetes.scripts)
@@ -83,8 +82,3 @@ class K3Command(PluginCommand):
 
         Console.error("Command options wrong")
         return ""
-
-
-
-
-
