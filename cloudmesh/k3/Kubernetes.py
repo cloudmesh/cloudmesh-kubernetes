@@ -68,6 +68,17 @@ class Kuberenetes:
     """
 
     @staticmethod
+    def oneline(script):
+        """
+        converts a script to one line command.
+        THis is useful to run a single ssh command and pass a one line script.
+
+        :param script:
+        :return:
+        """
+        return " && ".join(script.strip().splitline())
+
+    @staticmethod
     def set_master_endpoint(ip=None):
         if not ip:
             ip = Kuberenetes.do("all","ip")
