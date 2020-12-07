@@ -26,15 +26,10 @@ We augmented each steo with
 
 Do the steps 1-4 on EACH Pi (Master & Workers)
 
-1. **All:** Update and upgrade
+1. **All:** Update and upgrade and Disable swap (Interfers with Kubernetes)
 
    ```
    sudo apt-get update && sudo apt-get upgrade
-   ```
-
-2. **All:** Disable swap (Interfers with Kubernetes)
-
-   ```
    sudo dphys-swapfile swapoff
    sudo dphys-swapfile uninstall
    sudo update-rc.d dphys-swapfile remove
@@ -44,20 +39,20 @@ Do the steps 1-4 on EACH Pi (Master & Workers)
    Double Check That Swap Was Disabled: If there is no output,
    then this has been done correctly
 
-3. **All:** Edit `/boot/cmdline.txt`. Add this to the end of the line (put a SPACE
+2. **All:** Edit `/boot/cmdline.txt`. Add this to the end of the line (put a SPACE
    after whatever exists and then add this)
 
    ```
    sudo echo "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >> /boot/cmdline.txt
    ```
 
-4. **All:** Reboot the Pi
+3. **All:** Reboot the Pi
 
    ```
    sudo reboot
    ```
 
-5. **Master:** Next we set up kubernetes on the Master
+4. **Master:** Next we set up kubernetes on the Master
 
    SSH into the master Pi and run this command and get a kubernetes token
 
@@ -65,7 +60,8 @@ Do the steps 1-4 on EACH Pi (Master & Workers)
    curl -sfL https://get.k3s.io | sh -
    sudo cat /var/lib/rancher/k3s/server/node-token
    ```
-6. **Master:** Register the mater address by running this command and replacing
+
+5. **Master:** Register the mater address by running this command and replacing
    `MASTER_IP_ADDRESS` with the IP address of the master Pi
 
    ```
@@ -82,7 +78,7 @@ Do the steps 1-4 on EACH Pi (Master & Workers)
 
    ifconfig may be `if a` on newe osses, please check
 
-7. **Workers:** On each worker register the master. SSH into each of the
+6. **Workers:** On each worker register the master. SSH into each of the
    worker Pi's and run this command, replacing the
    `MASTER_IP_ADDRESS` with the IP address of the master Pi and
    `NODE_TOKEN_HERE` with the node token from above
@@ -92,7 +88,7 @@ Do the steps 1-4 on EACH Pi (Master & Workers)
    export KUBERNETES_MASTER=http://MASTER_IP_ADDRESS:8080
    ```
 
-8. **Master:** Confirm Setup in the master
+7. **Master:** Confirm Setup in the master
 
    ```
    sudo kubectl get nodes
