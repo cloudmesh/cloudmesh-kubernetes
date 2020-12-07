@@ -2,24 +2,35 @@ from cloudmesh.common.console import Console
 from cloudmesh.common.parameter import Parameter
 import textwrap
 import os
+from cloudmesh.common.Shell import Shell
 
+class Kubernetes(object):
 
-class Kuberenetes(object):
+    @staticmethod
+    def oneline(script):
+        """
+        converts a script to one line command.
+        THis is useful to run a single ssh command and pass a one line script.
+
+        :param script:
+        :return:
+        """
+        return " && ".join(textwrap.online(script).strip().splitline())
+
 
     scripts = {
         'all': {
-            "update": textwrap.dedent(
-                """ 
-                sudo apt-get update && sudo apt-get upgrade
+            "update": Shell.oneline(""" 
+                sudo apt-get update 
+                sudo apt-get upgrade
                 """),
-            "swap": textwrap.dedent(
-                """              
+            "swap": Shell.oneline("""              
                 sudo dphys-swapfile swapoff
                 sudo dphys-swapfile uninstall
                 sudo update-rc.d dphys-swapfile remove
                 sudo swapon --summary
                 """),
-            "cgroups": textwrap.dedent("""
+            "cgroups": Shell.oneline("""
                 sudo echo "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >> /boot/cmdline.txt
                 """),
             "reboot": "sudo reboot",
@@ -79,16 +90,6 @@ class Kuberenetes(object):
         token = Kuberenetes.sudo("cat /var/lib/rancher/k3s/server/node-token")
         return token
 
-    @staticmethod
-    def oneline(script):
-        """
-        converts a script to one line command.
-        THis is useful to run a single ssh command and pass a one line script.
-
-        :param script:
-        :return:
-        """
-        return " && ".join(script.strip().splitline())
 
     @staticmethod
     def set_master_endpoint(ip=None):

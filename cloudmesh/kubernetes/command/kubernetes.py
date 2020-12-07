@@ -4,7 +4,7 @@ from cloudmesh.common.console import Console
 from pprint import pprint
 from cloudmesh.common.debug import VERBOSE
 from cloudmesh.shell.command import map_parameters
-
+import oyaml as yaml
 
 
 class KubernetesCommand(PluginCommand):
@@ -50,11 +50,12 @@ class KubernetesCommand(PluginCommand):
                        'file',
                        'host')
 
-        from cloudmesh.kubernetes.Kubernetes import Kubernetes
-        
+        from cloudmesh.kubernetes.kubernetes import Kubernetes
+
         if arguments.scripts:
 
             pprint(Kubernetes.scripts)
+            print(yaml.dump(Kubernetes.scripts))
 
         elif arguments.deploy and arguments.file:
 
