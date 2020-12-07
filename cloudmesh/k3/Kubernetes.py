@@ -75,7 +75,7 @@ class Kuberenetes:
         return os.environ["KUBERNETES_MASTER"]
 
     @staticmethod
-    def do(kind, command, host):
+    def do(kind, command, host, ssh=False):
         """
         executes the script on the given host
 
@@ -84,8 +84,13 @@ class Kuberenetes:
         :return:
         """
         script = Kuberenetes.scripts[kind][command]
+        if ssh:
+            script = f'ssh {host} "{script}"'
         Console.msg(script)
-        Console.error("TODO")
+        # TODO: we should be using a command tt returns results so we can
+        #       parse for errors Shell.live seems good option. For now we just
+        #       do os.system in testing phase
+        os.system(script)
 
     @staticmethod
     def install(hosts, master=False, worker=False, force=False):
