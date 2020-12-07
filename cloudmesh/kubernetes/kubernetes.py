@@ -105,8 +105,9 @@ class Kubernetes(object):
         if ssh:
             script = f'ssh {host} "{script}"'
         Console.msg(script)
-        # TODO: we should be using a command tt returns results so we can
-        #       parse for errors Shell.live seems good option. For now we just
+        # TODO: we should be using the Host.ssh command
+        #       parse for errors Shell.live seems good option.
+        #       For now we just
         #       do os.system in testing phase
         os.system(script)
         return "not implemented"

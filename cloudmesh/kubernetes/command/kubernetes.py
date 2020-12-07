@@ -56,7 +56,8 @@ class KubernetesCommand(PluginCommand):
               kubernetes run [KEY...]
                 executes the script with the given keys
 
-                Example kubernetes run any test
+                Example:
+                     kubernetes run any test
         """
 
 
@@ -88,7 +89,7 @@ class KubernetesCommand(PluginCommand):
             # pprint (result)
             # table = Printer.write(result)
             # print(table)
-            
+
             table = Printer.write(result, order=['host', 'success','stderr'])
             print(table)
 
